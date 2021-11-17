@@ -20,7 +20,7 @@ source ~/.bashrc
 
 
 # try mysql
-sudo service mysql start
+# sudo service mysql start
 
 # re-run provision.sh to setup mysql
-sudo bash ./provision.sh
+# sudo bash ./provision.sh
