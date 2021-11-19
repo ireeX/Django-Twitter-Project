@@ -1,0 +1,9 @@
+version: '3'
+services:
+  mytwitterenv:
+    image: mytwitter:1.0
+    ports:
+      - 80:8000
+      - 9005:22
+    volumes:
+      - ./:/vagrant
