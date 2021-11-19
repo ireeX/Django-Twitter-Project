@@ -3,12 +3,12 @@
 ## Setup Docker Environment
 ### Start Docker:
 ```
-docker run -p 80:8000 -p 9005:22 -v "$(pwd)":/vagrant -i -t --name twitterenv ubuntu:18.04 bash
-apt install sudo
-sudo bash startup.sh
+docker run -p 80:8000 -p 9005:22 -v "$(pwd)":/vagrant -i -t --name mytwitterenv mytwitter:1.0
 ```
 ### Provision
 ```
+apt install sudo
+sudo bash startup.sh
 sudo bash ./provision.sh 
 echo 'export PATH="/home/iree/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
@@ -43,7 +43,7 @@ sudo service ssh restart
 ```
 You can connect to docker on your host with following command:
 ```
-ssh jiuzhang@localhost -p 9005
+ssh iree@localhost -p 9005
 ```
 To configure Pycharm Interpreter:  
 In Pycharm -> Preferences -> Project:XXX -> Python Interpreter -> Add... -> SSH Interpreter -> host:localhost / username:username / port:9005 -> next -> Password -> Next -> Change nothing -> Finish
