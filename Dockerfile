@@ -14,6 +14,8 @@ RUN cd /vagrant \
     && service mysql start \
     && bash ./provision.sh \
     && apt install -y openssh-server \
-    && mv ./sshd_config /etc/ssh/sshd_config
+    && mv ./sshd_config /etc/ssh/sshd_config\
+    && useradd -s  /bin/bash iree\
+    && usermod -aG sudo iree
 
 CMD ["/bin/bash"]
