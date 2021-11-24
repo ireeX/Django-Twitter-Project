@@ -17,6 +17,7 @@ class LoginSerializer(serializers.Serializer):
             raise exceptions.ValidationError({
                 'message': 'User does not exist.'
             })
+        return data
 
 
 class SignupSerializer(serializers.ModelSerializer):

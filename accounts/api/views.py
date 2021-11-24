@@ -44,6 +44,9 @@ class AccountViewSet(viewsets.ViewSet):
     @action(methods=['POST'], detail=False)
     def login(self, request):
         serializer = LoginSerializer(data=request.data)
+
+        # use serializer to valid user input
+        # is_valid() function will call run_validate() and create validated data
         if not serializer.is_valid():
             return Response({'success': False,
                              'message': "Please check input",
@@ -53,12 +56,15 @@ class AccountViewSet(viewsets.ViewSet):
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
 
+        # make usr authentication
         user = django_authenticate(username=username, password=password)
         if not user or user.is_anonymous:
             return Response({'success': False,
                              'message': "Username and password does not match.",
                              },
                             status=400)
+
+        # user is good, make login
         django_login(request, user)
         return Response({'success': True,
                          'user': UserSerializer(instance=user).data,
@@ -66,6 +72,7 @@ class AccountViewSet(viewsets.ViewSet):
 
     @action(methods=["POST"], detail=False)
     def signup(self, request):
+        # check user input
         serializer = SignupSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({'success': False,
@@ -73,7 +80,11 @@ class AccountViewSet(viewsets.ViewSet):
                              'error': serializer.errors,
                              },
                             status=400)
+
+        # user input is validated, save user information
         user = serializer.save()
+
+        # login user
         django_login(request, user)
         return Response({'success': True,
                          'user': UserSerializer(instance=user).data,
