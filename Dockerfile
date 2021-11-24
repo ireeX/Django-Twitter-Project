@@ -13,6 +13,7 @@ RUN cd /vagrant \
     && bash provision.sh \
     && service mysql start \
     && bash ./provision.sh \
+    && python -m pip install django-debug-toolbar \
     && apt install -y openssh-server \
     && mv ./sshd_config /etc/ssh/sshd_config\
     && useradd -s  /bin/bash iree\

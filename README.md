@@ -81,6 +81,30 @@ Or, you can install by using `pip install djangorestframework` command. After in
 Add `'rest_framework'` to settings.py to `INSTALLED_APPS`.
 And add `REST_FRAMEWORK` for future use.
 
-#Tips for Real World#
+#Tips for Real World
 **1. Use whitelist, not blacklist**
 >In Django Rest Framework, it provides some method such as `list, retrieve, destroy, put, patch...` in `ModelViewSet`class. We can create our class inheriting from ModelViewSet. This class will inherit all the method. However, it's not recommend for in your work. Because you should design the class only with necessary methods. Redundancy may bring risk.
+
+**2. Use UTC time in DataBase**
+
+**3. When create a new attribute in a table in the Database, choose *null = True* rather than set a default value**
+>Setting default value may bring trouble, especially when the table is very large. For example, there is a million data in the table, setting a new default value will cause a *for loop* to iterate this table, which may lead the database crush.
+
+**4. Don't delete data in database**
+> You can set an attribute such as *is_valid* to mark this data is useless
+> rather than delete it.
+
+**5. Changing table structure in your ORM,
+you need to ...**
+> **When add attribute:**
+> First migrate database, then deploy code
+> 
+> **When delete attribute**
+> First deploy code, then migrate database
+> 
+> **Because:**
+> It's ok for a web framework to have more data in database 
+> than in ORM. If you restart your webserver (deploy code) first after add attributes,
+> the server may crush since it cannot find data in the haven't migrated database.
+> 
+> **Caution: DON'T ADD AND DELETE AT THE SAME TIME**
