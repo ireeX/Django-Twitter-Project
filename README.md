@@ -34,17 +34,45 @@ mysql -u root -p
 ```
 sudo apt install openssh-server
 ```
+
 Find `PermitRootLogin prohibit-password` and change to `PermitRootLogin yes`to enable ssh remote visit docker
+
 ```
 sudo vim /etc/ssh/sshd_config
-```
-```
 sudo service ssh restart
 ```
+> Some issues may encounter when restart ssh:
+> 1. Loading host key failure:
+> ``` 
+> # service ssh start
+>  * Starting OpenBSD Secure Shell server sshd                                                
+> Could not load host key: /etc/ssh/ssh_host_rsa_key
+> Could not load host key: /etc/ssh/ssh_host_ecdsa_key
+> Could not load host key: /etc/ssh/ssh_host_ed25519_key
+> ```
+> To solve this problem, run `/usr/bin/ssh-keygen -A` manually.
+> 
+> 2. SSH is started by `sudo servise ssh start` and when check ssh status with `service ssh status`, returns error:` * sshd is not running`
+> 
+> To solve this problem, fikd and kill the ssh process. Then, start ssh again.
+> 
+> ```
+> $ ps axf | grep sshd
+>   93 pts/0    S+     0:00      \_ grep --color=auto sshd
+>   49 ?        Ss     0:00 /usr/sbin/sshd
+> $ kill -9 49
+> $ sudo service ssh start
+>  * Starting OpenBSD Secure Shell server sshd                                         [ OK ] 
+> $ service ssh status
+>  * sshd is running
+> ```
+
 You can connect to docker on your host with following command:
+
 ```
 ssh iree@localhost -p 9005
 ```
+
 To configure Pycharm Interpreter:  
 In Pycharm -> Preferences -> Project:XXX -> Python Interpreter -> Add... -> SSH Interpreter -> host:localhost / username:username / port:9005 -> next -> Password -> Next -> Change nothing -> Finish
 
