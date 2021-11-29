@@ -1,4 +1,4 @@
-from django.test import TestCase
+from testing_utils.testcases import TestCase
 from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 
@@ -11,12 +11,7 @@ class AccountApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = self.createUser('admin', 'admin@twitter.com', 'correct password')
-
-    def createUser(self, username, email, password):
-        # use create_user() rather than create()
-        # since password need to be encrypted, username and email need to be normalized
-        return User.objects.create_user(username, email, password)
+        self.user = self.create_user('admin', 'admin@twitter.com', 'correct password')
 
     def test_login(self):
         # test for login HTTP method, which must use GET method

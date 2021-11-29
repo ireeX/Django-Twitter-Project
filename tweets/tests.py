@@ -6,8 +6,7 @@ from tweets.models import Tweet
 import pytz
 
 
-class TweetTests(TestCase):
-
+class TweetModelTests(TestCase):
 
     def test_hours_to_now(self):
         user = User.objects.create_user(username='tweet_test')
