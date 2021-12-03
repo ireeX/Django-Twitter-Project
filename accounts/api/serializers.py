@@ -2,15 +2,21 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework import exceptions
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email')
 
+
 class UserSerializerForTweet(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username')
+
+
+class UserSerializerForFriendship(UserSerializerForTweet):
+    pass
 
 
 class LoginSerializer(serializers.Serializer):
@@ -52,7 +58,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
         user = User.objects.create_user(
             username=username,
-            password=password,
             email=email,
+            password=password
         )
         return user

@@ -16,6 +16,7 @@ class Friendship(models.Model):
         related_name='follower_friendship',
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    is_mutual = models.BooleanField(default=False)
 
     class Meta:
         index_together = (
@@ -28,3 +29,4 @@ class Friendship(models.Model):
         unique_together = (
             ('from_user_id', 'to_user_id'),
         )
+        ordering = ('-created_at',)
