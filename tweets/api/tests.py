@@ -58,9 +58,6 @@ class TweetApiTests(TestCase):
             'content': 'Hello World!',
         })
         self.assertEqual(response.status_code, 201)
-        print()
-        print(response.data)
-        print()
         self.assertEqual(response.data['tweet']['user']['id'], self.user1.id)
         self.assertIn(response.data['tweet']['content'], 'Hello World!')
         self.assertEqual(Tweet.objects.count(), tweets_count + 1)
