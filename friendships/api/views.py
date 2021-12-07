@@ -52,7 +52,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
             }, status=status.HTTP_200_OK)
 
         # set mutual following
-        if self.set_mutual_following(data, type='follow'):
+        if self.set_mutual_following(data, follow_type='follow'):
             data['is_mutual'] = True
 
         serializer = FriendshipSerializerForCreate(data=data)
@@ -89,14 +89,17 @@ class FriendshipViewSet(viewsets.GenericViewSet):
             to_user=data['to_user_id'],
         ).delete()
 
-        self.set_mutual_following(data, type='unfollow')
+        self.set_mutual_following(data, follow_type='unfollow')
 
         return Response({
             'success': True,
             'deleted': deleted,
         })
 
-    def set_mutual_following(self, data, type):
+    def set_mutual_following(self, data, follow_type):
+        # Set is_mutual attribute for the other user in the friendship
+        # Return boolean type. True indicates the other user is also a follower,
+        # while False indicates the other user is not a follower.
         from_user=data['from_user_id']
         to_user = data['to_user_id']
         friendship = None
@@ -108,9 +111,9 @@ class FriendshipViewSet(viewsets.GenericViewSet):
         if not friendship:
             return False
 
-        if type == 'follow':
+        if follow_type == 'follow':
             friendship.is_mutual = True
-        elif type == 'unfollow':
+        elif follow_type == 'unfollow':
             friendship.is_mutual = False
         friendship.save()
         return True
