@@ -7,6 +7,7 @@ from tweets.api.serializers import (
     TweetSerializerForCreate,
 )
 from tweets.models import Tweet
+from newsfeeds.services import NewsFeedService
 
 class TweetViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
@@ -34,6 +35,7 @@ class TweetViewSet(mixins.CreateModelMixin,
 
         # serializer.save() will call create() method in TweetSerializerForCreate
         tweet = serializer.save()
+        NewsFeedService.fanout_to_followers(tweet)
         return Response({
             'success': True,
             'tweet': TweetSerializer(tweet).data,

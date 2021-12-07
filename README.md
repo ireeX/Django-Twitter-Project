@@ -1,6 +1,9 @@
 # Project Introduction
-This is a twitter-like project. You can perform post and 
-view tweets, follow and unfollow your friends.
+This is a twitter-like project. You can signup and login to your account, 
+perform post and view tweets, follow and unfollow your
+friends. 
+
+We use push mode (fanout on write) for newsfeed module.
 
 ## APIs:
 
