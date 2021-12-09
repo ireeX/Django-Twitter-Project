@@ -8,6 +8,7 @@ from tweets.api.serializers import (
 )
 from tweets.models import Tweet
 from newsfeeds.services import NewsFeedService
+from utils.decorators import required_params
 
 class TweetViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
@@ -43,9 +44,8 @@ class TweetViewSet(mixins.CreateModelMixin,
 
     # The authorization level is set to "AllowAny()" in get_permissions() function
     # return all tweets from the user
+    @required_params(params=['user_id'])
     def list(self, request):
-        if 'user_id' not in request.query_params:
-            return Response('cannot find user', status=400)
         user_id = request.query_params['user_id']
         tweets = Tweet.objects.filter(user_id=user_id,).order_by('-created_at')
 

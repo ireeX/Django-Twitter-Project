@@ -1,6 +1,5 @@
-from testing_utils.testcases import TestCase
+from utils.testcases import TestCase
 from rest_framework.test import APIClient
-from django.contrib.auth.models import User
 from tweets.models import Tweet
 
 TWEET_CREATE_URL = '/api/tweets/'

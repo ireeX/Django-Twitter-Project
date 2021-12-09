@@ -1,4 +1,4 @@
-from testing_utils.testcases import TestCase
+from utils.testcases import TestCase
 
 
 class CommentModelTests(TestCase):

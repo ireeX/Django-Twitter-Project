@@ -25,7 +25,6 @@ class FollowingSerializer(FollowerSerializer):
 class FriendshipSerializerForCreate(serializers.ModelSerializer):
     from_user_id = serializers.IntegerField()
     to_user_id = serializers.IntegerField()
-    is_mutual = serializers.BooleanField()
 
     class Meta:
         model = Friendship
