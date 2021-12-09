@@ -1,5 +1,4 @@
-from testing_utils.testcases import TestCase
-from django.contrib.auth.models import User
+from utils.testcases import TestCase
 from rest_framework.test import APIClient
 from friendships.models import Friendship
 

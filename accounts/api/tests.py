@@ -1,6 +1,5 @@
-from testing_utils.testcases import TestCase
+from utils.testcases import TestCase
 from rest_framework.test import APIClient
-from django.contrib.auth.models import User
 
 LOGIN_URL ='/api/accounts/login/'
 LOGOUT_URL = '/api/accounts/logout/'
