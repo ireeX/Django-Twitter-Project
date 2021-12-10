@@ -53,7 +53,7 @@ class TweetViewSet(mixins.CreateModelMixin,
     @required_params(params=['user_id'])
     def list(self, request):
         user_id = request.query_params['user_id']
-        tweets = Tweet.objects.filter(user_id=user_id,).order_by('-created_at')
+        tweets = Tweet.objects.filter(user_id=user_id, is_deleted=False).order_by('-created_at')
 
         serializer = TweetSerializer(tweets, many=True)
         return Response({'tweets': serializer.data})
@@ -74,3 +74,9 @@ class TweetViewSet(mixins.CreateModelMixin,
             TweetSerializer(tweet).data,
             status=status.HTTP_200_OK,
         )
+
+    def destroy(self, request, *args, **kwargs):
+        tweet = self.get_object()
+        tweet.is_deleted = True
+        tweet.save()
+        return Response({'success': True}, status=status.HTTP_200_OK)
