@@ -5,6 +5,7 @@ from tweets.models import Tweet
 TWEET_CREATE_URL = '/api/tweets/'
 TWEET_LIST_URL = '/api/tweets/'
 TWEET_UPDATE_URL = '/api/tweets/{}/'
+TWEET_DELETE_URL = '/api/tweets/{}/'
 
 class TweetApiTests(TestCase):
 
@@ -25,6 +26,9 @@ class TweetApiTests(TestCase):
             self.create_tweet(self.user2, f'content{j} from user1')
             for j in range(2)
         ]
+
+        self.user2_client = APIClient()
+        self.user2_client.force_authenticate(self.user2)
 
     def test_list_tweets(self):
         # test invalid request without user_id parameter
@@ -63,11 +67,47 @@ class TweetApiTests(TestCase):
         self.assertEqual(Tweet.objects.count(), tweets_count + 1)
 
     def test_update_tweets(self):
-        tweet = self.create_tweet(user=self.user1, content='hello')
-        response = self.user1_client.put(TWEET_UPDATE_URL.format(tweet.id), {
-            'content': 'hello2',
-        })
+        tweet = self.tweets1[0]
+        # test update tweet from anonymous user
+        response = self.anonymous_client.put(
+            TWEET_UPDATE_URL.format(tweet.id),
+            {'content': 'hello', }
+        )
+        self.assertEqual(response.status_code, 403)
+
+        # test update tweet from unauthorized user
+        response = self.user2_client.put(
+            TWEET_UPDATE_URL.format(tweet.id),
+            {'content': 'hello', }
+        )
+        self.assertEqual(response.status_code, 403)
+
+        # test normal update tweet
+        before_updated_at = tweet.updated_at
+        response = self.user1_client.put(
+            TWEET_UPDATE_URL.format(tweet.id),
+            {'content': 'hello',}
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['content'], 'hello2')
+        self.assertEqual(response.data['content'], 'hello')
+        self.assertNotEqual(response.data['updated_at'], before_updated_at)
 
+    def test_destroy_tweets(self):
+        tweet = self.tweets2[0]
+        url = TWEET_DELETE_URL.format(tweet.id)
 
+        # test authentication required
+        response = self.anonymous_client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # test authorization required
+        response = self.user1_client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # test normal delete tweet
+        count = Tweet.objects.count()
+        response = self.user2_client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        tweet.refresh_from_db()
+        self.assertEqual(tweet.is_deleted, True)
+        self.assertEqual(Tweet.objects.count(), count)
