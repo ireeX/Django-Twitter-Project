@@ -4,6 +4,7 @@ from tweets.models import Tweet
 
 TWEET_CREATE_URL = '/api/tweets/'
 TWEET_LIST_URL = '/api/tweets/'
+TWEET_UPDATE_URL = '/api/tweets/{}/'
 
 class TweetApiTests(TestCase):
 
@@ -60,5 +61,13 @@ class TweetApiTests(TestCase):
         self.assertEqual(response.data['tweet']['user']['id'], self.user1.id)
         self.assertIn(response.data['tweet']['content'], 'Hello World!')
         self.assertEqual(Tweet.objects.count(), tweets_count + 1)
+
+    def test_update_tweets(self):
+        tweet = self.create_tweet(user=self.user1, content='hello')
+        response = self.user1_client.put(TWEET_UPDATE_URL.format(tweet.id), {
+            'content': 'hello2',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['content'], 'hello2')
 
 

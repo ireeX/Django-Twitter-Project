@@ -8,7 +8,7 @@ class TweetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tweet
-        fields = ('id', 'user', 'content', 'created_at',)
+        fields = ('id', 'user', 'content', 'created_at', 'updated_at')
 
 class TweetSerializerForCreate(serializers.ModelSerializer):
     content = serializers.CharField(min_length=6, max_length=255)
@@ -26,3 +26,14 @@ class TweetSerializerForCreate(serializers.ModelSerializer):
 
 class TweetSerializerForComment(TweetSerializer):
     pass
+
+
+class TweetSerializerForUpdate(serializers.ModelSerializer):
+    class Meta:
+        model = Tweet
+        fields = ('content',)
+
+    def update(self, instance, validated_data):
+        instance.content = validated_data['content']
+        instance.save()
+        return instance
