@@ -1,28 +1,34 @@
-from rest_framework import mixins
+from rest_framework import mixins, status
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from tweets.api.serializers import (
     TweetSerializer,
     TweetSerializerForCreate,
+    TweetSerializerForUpdate,
 )
 from tweets.models import Tweet
 from newsfeeds.services import NewsFeedService
 from utils.decorators import required_params
+from utils.permissions import IsObjectOwner
+
 
 class TweetViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    GenericViewSet):
 
-    serializer_class = TweetSerializerForCreate
+    serializer_class = TweetSerializerForUpdate
+    queryset = Tweet.objects.all() 
 
     def get_permissions(self):
         if self.action == 'list':
             return [AllowAny()]
+        if self.action in ('update', 'destroy'):
+            return [IsAuthenticated(), IsObjectOwner()]
         return [IsAuthenticated()]
 
     # The authorization level is set to "IsAuthenticated()" in get_permissions() function
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         serializer = TweetSerializerForCreate(
             data=request.data,
             context={'request': request},
@@ -51,3 +57,20 @@ class TweetViewSet(mixins.CreateModelMixin,
 
         serializer = TweetSerializer(tweets, many=True)
         return Response({'tweets': serializer.data})
+
+    def update(self, request, *args, **kwargs):
+        serializer = TweetSerializerForUpdate(
+            instance=self.get_object(),
+            data=request.data,
+        )
+        if not serializer.is_valid():
+            return Response({
+                'message': 'Please check input.',
+                'error': serializer.errors,
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        tweet = serializer.save()
+        return Response(
+            TweetSerializer(tweet).data,
+            status=status.HTTP_200_OK,
+        )

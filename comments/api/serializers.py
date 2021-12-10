@@ -20,16 +20,28 @@ class CommentSerializerForCreate(serializers.ModelSerializer):
         model = Comment
         fields = ('tweet_id', 'user_id', 'content',)
 
+    # this function is called by serializer.is_valid() in CommentViewSet
     def validate(self, data):
         tweet_id = data['tweet_id']
         if not Tweet.objects.filter(id=tweet_id).exists():
             raise ValidationError({'message': 'tweet does not exist.'})
         return data
 
-
+    # this function is called by serializer.save() in CommentViewSet
     def create(self, validated_data):
         return Comment.objects.create(
             user_id=validated_data['user_id'],
             tweet_id=validated_data['tweet_id'],
             content=validated_data['content'],
         )
+
+
+class CommentSerializerForUpdate(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('content',)
+
+    def update(self, instance, validated_data):
+        instance.content = validated_data['content']
+        instance.save()
+        return instance

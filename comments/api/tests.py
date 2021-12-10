@@ -1,5 +1,7 @@
 from utils.testcases import TestCase
 from rest_framework.test import APIClient
+from django.utils import timezone
+from comments.models import Comment
 
 
 COMMENT_URL = '/api/comments/'
@@ -73,3 +75,62 @@ class CommentApiTests(TestCase):
             'tweet_id': self.tweet.id,
             'user_id': self.user2.id,
         })
+
+    def test_update(self):
+        comment = self.create_comment(self.user1, self.tweet, {'content': 'origin'})
+        url = '{}{}/'.format(COMMENT_URL, comment.id)
+
+        # test authentication required
+        response = self.anonymous_client.put(url, {'content': 'new'})
+        self.assertEqual(response.status_code, 403)
+
+        # test authorization required
+        response = self.user_client2.put(url, {'content': 'new'})
+        self.assertEqual(response.status_code, 403)
+        comment.refresh_from_db()   # the comment in cache is not refreshed. need to reload from db.
+        self.assertNotEqual(comment.content, 'new')
+
+        # test normal update comment
+        response = self.user_client1.put(url, {'content': 'new'})
+        comment.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(comment.content, 'new')
+
+        # cannot update data other than content
+        before_updated_at = comment.updated_at
+        before_created_at = comment.created_at
+        now = timezone.now()
+        another_tweet = self.create_tweet(user=self.user2)
+        response = self.user_client1.put(url, {
+            'content': 'latest',
+            'user_id': self.user2.id,
+            'tweet_id': another_tweet.id,
+            'created_at': now,
+
+        })
+        self.assertEqual(response.status_code, 200)
+        comment.refresh_from_db()
+        self.assertEqual(comment.content, 'latest')
+        self.assertEqual(comment.user, self.user1)
+        self.assertEqual(comment.tweet, self.tweet)
+        self.assertEqual(comment.created_at, before_created_at)
+        self.assertNotEqual(comment.updated_at, before_updated_at)
+
+
+    def test_destroy(self):
+        comment = self.create_comment(self.user1, self.tweet)
+        url = '{}{}/'.format(COMMENT_URL, comment.id)
+
+        # test authentication required
+        response = self.anonymous_client.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # test authorization required
+        response = self.user_client2.delete(url)
+        self.assertEqual(response.status_code, 403)
+
+        # test normal delete comment
+        count = Comment.objects.count()
+        response = self.user_client1.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Comment.objects.count(), count - 1)
