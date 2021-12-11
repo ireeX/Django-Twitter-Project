@@ -53,7 +53,11 @@ class TweetViewSet(mixins.CreateModelMixin,
     @required_params(params=['user_id'])
     def list(self, request):
         user_id = request.query_params['user_id']
-        tweets = Tweet.objects.filter(user_id=user_id, is_deleted=False).order_by('-created_at')
+        # prefetch_related('user') is called because it can optimize the TweetSerializer
+        # if it is not used, TweetSerializer will call UserSerializer
+        # and make as many query as the tweet count to retrieve user information from db
+        # after using prefetch_related(), there will only be one query
+        tweets = Tweet.objects.filter(user_id=user_id, is_deleted=False).prefetch_related('user').order_by('-created_at')
 
         serializer = TweetSerializer(tweets, many=True)
         return Response({'tweets': serializer.data})
