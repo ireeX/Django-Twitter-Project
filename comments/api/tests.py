@@ -31,7 +31,6 @@ class CommentApiTests(TestCase):
 
         # test missing parameters
         response = self.user_client1.post(COMMENT_URL, {'tweet_id': self.tweet.id})
-        print(response.data)
         self.assertEqual(response.status_code, 400)
 
         # test normal post comment

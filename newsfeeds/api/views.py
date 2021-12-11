@@ -9,7 +9,7 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return NewsFeed.objects.filter(user=self.request.user)
+        return NewsFeed.objects.filter(user=self.request.user).prefetch_related('user', 'tweet')
 
     def list(self, request):
         serializer = NewsFeedSerializer(self.get_queryset(), many=True)
