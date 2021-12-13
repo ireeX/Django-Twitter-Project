@@ -26,8 +26,8 @@ def required_params(method='GET', params=None):
             if missing_params:
                 params_str = ', '.join(missing_params)
                 return Response({
-                    'message': u'missing {} in request'.format(params_str),
-                    'success': False
+                    'success': False,
+                    'error': u'missing {} in request'.format(params_str),
                 }, status=status.HTTP_400_BAD_REQUEST)
             return view_func(instance, request, *args, **kwargs)
         return _wrapped_view

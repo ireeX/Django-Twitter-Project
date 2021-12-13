@@ -1,7 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from tweets.models import Tweet
 from comments.models import Comment
 from comments.api.serializers import (
     CommentSerializer,

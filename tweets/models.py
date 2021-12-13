@@ -23,6 +23,14 @@ class Tweet(models.Model):
     def hours_to_now(self):
         return (datetime.now(tz=pytz.utc) - self.created_at).seconds // 3600
 
+    """
+    @property
+    def comments(self, is_preview):
+        return self.comment_set.all()
+        # this is equal the following. Django special.
+        # return Comment.objects.filter(tweet=self)
+    """
+
     def __str__(self):
         # easy for print tweet
         return f'{self.created_at} {self.user}: {self.content}'
