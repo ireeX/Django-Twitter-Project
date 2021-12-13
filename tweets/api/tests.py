@@ -6,6 +6,7 @@ TWEET_CREATE_URL = '/api/tweets/'
 TWEET_LIST_URL = '/api/tweets/'
 TWEET_UPDATE_URL = '/api/tweets/{}/'
 TWEET_DELETE_URL = '/api/tweets/{}/'
+TWEET_RETRIEVE_URL = '/api/tweets/{}/?is_preview={}'
 
 class TweetApiTests(TestCase):
 
@@ -111,3 +112,34 @@ class TweetApiTests(TestCase):
         tweet.refresh_from_db()
         self.assertEqual(tweet.is_deleted, True)
         self.assertEqual(Tweet.objects.count(), count)
+
+    def test_retrieve_tweet(self):
+        tweet = self.tweets1[0]
+        # test retrieve a non-exist tweet
+        url = TWEET_RETRIEVE_URL.format(-1, 'False')
+        response = self.anonymous_client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+        # test retrieve without is_preview attribute
+        url = '/api/tweets/{}/'.format(tweet.id)
+        response = self.anonymous_client.get(url)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['success'], False)
+
+        # test retrieve tweet with all comment
+        url = TWEET_RETRIEVE_URL.format(tweet.id, 'False')
+        response = self.anonymous_client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['comments']), 0)
+        self.create_comment(self.user1, tweet, 'hello1')
+        self.create_comment(self.user2, tweet, 'hello2')
+        self.create_comment(self.user1, tweet, 'hello3')
+        self.create_comment(self.user2, tweet, 'hello4')
+        url = TWEET_RETRIEVE_URL.format(tweet.id, 'False')
+        response = self.anonymous_client.get(url)
+        self.assertEqual(len(response.data['comments']), 4)
+
+        # test retrieve tweet with preview comment
+        url = TWEET_RETRIEVE_URL.format(tweet.id, 'True')
+        response = self.anonymous_client.get(url)
+        self.assertEqual(len(response.data['comments']), 3)
