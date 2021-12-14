@@ -109,7 +109,8 @@ Or, you can install by using `pip install djangorestframework` command. After in
 Add `'rest_framework'` to settings.py to `INSTALLED_APPS`.
 And add `REST_FRAMEWORK` for future use.
 
-#Tips for Real World
+# Tips for Real World
+ 
 **1. Use whitelist, not blacklist**
 >In Django Rest Framework, it provides some method such as `list, retrieve, destroy, put, patch...` in `ModelViewSet`class. We can create our class inheriting from ModelViewSet. This class will inherit all the method. However, it's not recommend for in your work. Because you should design the class only with necessary methods. Redundancy may bring risk.
 
@@ -140,3 +141,8 @@ you need to ...**
 > the server may crush since it cannot find data in the haven't migrated database.
 > 
 > **Caution: DON'T ADD AND DELETE AT THE SAME TIME**
+
+**6. To assure data is unique, it should be implemented in DB level.**
+> In Django, "unique_together" in model can help you with it.
+
+
