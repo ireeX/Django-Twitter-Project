@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'friendships',
     'newsfeeds',
     'comments',
+    'likes',
 
     # third party packages
     'rest_framework',

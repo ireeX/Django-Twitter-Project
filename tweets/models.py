@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import datetime, timedelta
+from django.contrib.contenttypes.models import ContentType
+from datetime import datetime
+from likes.models import Like
 
 import pytz
 
@@ -22,6 +24,13 @@ class Tweet(models.Model):
     @property
     def hours_to_now(self):
         return (datetime.now(tz=pytz.utc) - self.created_at).seconds // 3600
+
+    @property
+    def like_set(self):
+        return Like.objects.filter(
+            content_type=ContentType.objects.get_for_model(Tweet),
+            object_id=self.id,
+        ).order_by('-created_at')
 
     """
     @property
