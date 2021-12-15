@@ -25,6 +25,7 @@ class Tweet(models.Model):
     def hours_to_now(self):
         return (datetime.now(tz=pytz.utc) - self.created_at).seconds // 3600
 
+    # for reverse look from tweet to likes
     @property
     def like_set(self):
         return Like.objects.filter(
@@ -34,7 +35,7 @@ class Tweet(models.Model):
 
     """
     @property
-    def comments(self, is_preview):
+    def comments(self):
         return self.comment_set.all()
         # this is equal the following. Django special.
         # return Comment.objects.filter(tweet=self)
