@@ -16,6 +16,7 @@ class Comment(models.Model):
     class Meta:
         index_together = (('tweet', 'created_at'),)
 
+    # for convenience of reverse lookup from comment to like
     @property
     def like_set(self):
         return Like.objects.filter(
