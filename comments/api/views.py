@@ -28,7 +28,11 @@ class CommentViewSet(viewsets.GenericViewSet):
         queryset = self.get_queryset()
         # to be continued, order by likes count
         comments = self.filter_queryset(queryset).prefetch_related('user').order_by('created_at')
-        serializer = CommentSerializer(comments, many=True)
+        serializer = CommentSerializer(
+            comments,
+            context={'request': request},
+            many=True
+        )
         return Response({
             'success': True,
             'comments': serializer.data,
@@ -48,7 +52,10 @@ class CommentViewSet(viewsets.GenericViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         comment = serializer.save()
-        return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+        return Response(
+            CommentSerializer(comment, context={'request': request}).data,
+            status=status.HTTP_201_CREATED
+        )
 
     def update(self, request, *args, **kwargs):
         # self.get_object() will raise 404 if cannot find the object
@@ -64,7 +71,7 @@ class CommentViewSet(viewsets.GenericViewSet):
 
         comment = serializer.save()
         return Response(
-            CommentSerializer(comment).data,
+            CommentSerializer(comment, context={'request': request}).data,
             status=status.HTTP_200_OK,
         )
 
