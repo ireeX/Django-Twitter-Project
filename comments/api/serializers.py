@@ -3,14 +3,33 @@ from rest_framework.exceptions import ValidationError
 from comments.models import Comment
 from accounts.api.serializers import UserSerializerForComment
 from tweets.models import Tweet
+from likes.services import LikeService
 
 
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializerForComment()
+    likes_count = serializers.SerializerMethodField()
+    has_liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ('id', 'tweet_id', 'user', 'content', 'created_at', 'updated_at',)
+        fields = (
+            'id',
+            'tweet_id',
+            'user',
+            'content',
+            'created_at',
+            'updated_at',
+            'likes_count',
+            'has_liked',
+        )
+
+    def get_likes_count(self, obj):
+        return obj.like_set.count()
+
+    def get_has_liked(self, obj):
+        return LikeService.has_liked(self.context['request'].user, obj)
+
 
 class CommentSerializerForCreate(serializers.ModelSerializer):
     tweet_id = serializers.IntegerField()
@@ -45,10 +64,3 @@ class CommentSerializerForUpdate(serializers.ModelSerializer):
         instance.content = validated_data['content']
         instance.save()
         return instance
-
-class CommentSerializerForTweet(serializers.ModelSerializer):
-    user = UserSerializerForComment()
-
-    class Meta:
-        model = Comment
-        fields = ('id', 'user', 'content', 'created_at', 'updated_at',)

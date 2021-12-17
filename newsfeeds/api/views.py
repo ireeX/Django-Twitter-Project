@@ -12,7 +12,12 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
         return NewsFeed.objects.filter(user=self.request.user).prefetch_related('user', 'tweet')
 
     def list(self, request):
-        serializer = NewsFeedSerializer(self.get_queryset(), many=True)
+        serializer = NewsFeedSerializer(
+            self.get_queryset(),
+            # for TweetSerializer.get_has_liked()
+            context={'request': request},
+            many=True,
+        )
         return Response({
             'newsfeeds': serializer.data,
         }, status=status.HTTP_200_OK)

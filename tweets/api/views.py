@@ -6,7 +6,7 @@ from tweets.api.serializers import (
     TweetSerializer,
     TweetSerializerForCreate,
     TweetSerializerForUpdate,
-    TweetSerializerWithComments,
+    TweetSerializerWithDetail,
 )
 from tweets.models import Tweet
 from newsfeeds.services import NewsFeedService
@@ -46,7 +46,7 @@ class TweetViewSet(mixins.CreateModelMixin,
         NewsFeedService.fanout_to_followers(tweet)
         return Response({
             'success': True,
-            'tweet': TweetSerializer(tweet).data,
+            'tweet': TweetSerializer(tweet, context={'request': request},).data,
         }, status=201)
 
     # The authorization level is set to "AllowAny()" in get_permissions() function
@@ -54,12 +54,21 @@ class TweetViewSet(mixins.CreateModelMixin,
     @required_params(params=['user_id'])
     def list(self, request):
         user_id = request.query_params['user_id']
-        # prefetch_related('user') is called because it can optimize the TweetSerializer
-        # if it is not used, TweetSerializer will call UserSerializer
-        # and make as many query as the tweet count to retrieve user information from db
-        # after using prefetch_related(), there will only be one query
-        tweets = Tweet.objects.filter(user_id=user_id, is_deleted=False).prefetch_related('user').order_by('-created_at')
-        serializer = TweetSerializer(tweets, many=True)
+        # prefetch_related('user') is called because it can optimize
+        # the TweetSerializer if it is not used, TweetSerializer will call
+        # UserSerializer and make as many query as the tweet count to retrieve
+        # user information from db after using prefetch_related(),
+        # there will only be one query
+        tweets = Tweet.objects.filter(
+            user_id=user_id,
+            is_deleted=False
+        ).prefetch_related('user').order_by('-created_at')
+
+        serializer = TweetSerializer(
+            tweets,
+            context={'request': request},
+            many=True
+        )
         return Response({'tweets': serializer.data})
 
     @required_params(params=['is_preview'])
@@ -75,7 +84,9 @@ class TweetViewSet(mixins.CreateModelMixin,
 
         is_preview = request.query_params.get('is_preview').lower()
         return Response(
-            TweetSerializerWithComments(tweet, context={'is_preview': is_preview}).data
+            TweetSerializerWithDetail(
+                tweet,
+                context={'is_preview': is_preview, 'request': request}).data
         )
 
     def update(self, request, *args, **kwargs):
@@ -91,7 +102,7 @@ class TweetViewSet(mixins.CreateModelMixin,
 
         tweet = serializer.save()
         return Response(
-            TweetSerializer(tweet).data,
+            TweetSerializer(tweet, context={'request': request}).data,
             status=status.HTTP_200_OK,
         )
 
