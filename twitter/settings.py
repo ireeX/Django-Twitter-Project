@@ -46,11 +46,13 @@ INSTALLED_APPS = [
     'newsfeeds',
     'comments',
     'likes',
+    'inbox',
 
     # third party packages
     'rest_framework',
     'debug_toolbar',
     'django_filters',
+    'notifications',
 ]
 
 REST_FRAMEWORK = {
