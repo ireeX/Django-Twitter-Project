@@ -11,7 +11,7 @@ class NotificationService:
         target = like.content_object
         if like.user == target.user:
             return
-        verb = 'liked your {}'.format(target.__class__)
+        verb = 'liked your {}'.format(target.__class__.__name__).lower()
         notify.send(
             sender=like.user,
             recipient=target.user,
