@@ -145,4 +145,6 @@ you need to ...**
 **6. To assure data is unique, it should be implemented in DB level.**
 > In Django, "unique_together" in model can help you with it.
 
+**7. Usually, do not use Third Party Service in Unit Test.**
+
 
