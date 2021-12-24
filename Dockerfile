@@ -14,6 +14,9 @@ RUN cd /vagrant \
     && service mysql start \
     && bash ./provision.sh \
     && python -m pip install django-debug-toolbar \
+    && pip install django-notifications-hq \
+    && pip install boto3 \
+    && pip install django-storages \
     && apt install -y openssh-server \
     && mv ./sshd_config /etc/ssh/sshd_config\
     && useradd -s  /bin/bash iree\
