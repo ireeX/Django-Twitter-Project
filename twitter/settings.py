@@ -158,10 +158,6 @@ TESTING = (" ".join(sys.argv)).find('manage.py test') != -1
 if TESTING:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-AWS_STORAGE_BUCKET_NAME = 'django-twitter'
-AWS_3_REGION_NAME = 'us-east-1'
-
-
 try:
     from .local_settings import *
 except:
