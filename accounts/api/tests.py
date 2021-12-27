@@ -1,10 +1,14 @@
 from utils.testcases import TestCase
 from rest_framework.test import APIClient
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 
 LOGIN_URL ='/api/accounts/login/'
 LOGOUT_URL = '/api/accounts/logout/'
 SIGNUP_URL = '/api/accounts/signup/'
 LOGIN_STATUS_URL = '/api/accounts/login_status/'
+USER_PROFILE_DETAIL_URL = '/api/profiles/{}/'
+
 
 class AccountApiTests(TestCase):
 
@@ -112,3 +116,43 @@ class AccountApiTests(TestCase):
         response = self.client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], True)
 
+
+class UserProfileApiTests(TestCase):
+
+    def test_update(self):
+        user1, client1 = self.create_user_and_client('user1')
+        user_profile = user1.profile
+        user_profile.nickname = 'test nickname'
+        user_profile.save()
+        url = USER_PROFILE_DETAIL_URL.format(user_profile.id)
+
+        # test authorization for update profile
+        user2, client2 = self.create_user_and_client('user2')
+        response = client2.put(url, {
+            'nickname': 'updated nickname',
+        })
+        self.assertEqual(response.status_code, 403)
+        user_profile.refresh_from_db()
+        self.assertEqual(user_profile.nickname, 'test nickname')
+
+        # test normal update nickname
+        response = client1.put(url, {
+            'nickname': 'updated nickname'
+        })
+        self.assertEqual(response.status_code, 200)
+        user_profile.refresh_from_db()
+        self.assertEqual(user_profile.nickname, 'updated nickname')
+
+        # test update avatar
+        response = client1.put(url, {
+            'avatar': SimpleUploadedFile(
+                name = 'test_avatar.jpg',
+                # str.encode() turn the str to byte
+                content=str.encode('a fake image'),
+                content_type='image/jpeg',
+            )
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual('test_avatar' in response.data['avatar'], True)
+        user_profile.refresh_from_db()
+        self.assertIsNotNone(user_profile.avatar)
