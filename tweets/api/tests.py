@@ -1,6 +1,8 @@
-from utils.testcases import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
-from tweets.models import Tweet
+from utils.testcases import TestCase
+from tweets.models import Tweet, TweetPhoto
+
 
 TWEET_CREATE_URL = '/api/tweets/'
 TWEET_LIST_URL = '/api/tweets/'
@@ -143,3 +145,66 @@ class TweetApiTests(TestCase):
         url = TWEET_RETRIEVE_URL.format(tweet.id, 'True')
         response = self.anonymous_client.get(url)
         self.assertEqual(len(response.data['comments']), 3)
+
+    def test_create_tweet_with_photos(self):
+        # test create tweet without photos
+        response = self.user1_client.post(TWEET_CREATE_URL, {
+            'content': 'test not photo upload',
+        })
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(TweetPhoto.objects.count(), 0)
+
+        # test create tweet with one photo
+        file1 = SimpleUploadedFile(
+            name='fakeimage1.jpg',
+            content=str.encode('first fake image'),
+            content_type='image/jpeg',
+        )
+        response = self.user1_client.post(TWEET_CREATE_URL, {
+            'content': 'test 1 photo upload',
+            'files': [file1]
+        })
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(TweetPhoto.objects.count(), 1)
+
+        # test create tweet with multiple photo
+        file2 = SimpleUploadedFile(
+            name='fakeimage2.jpg',
+            content=str.encode('second fake image'),
+            content_type='image/jpeg',
+        )
+        file3 = SimpleUploadedFile(
+            name='fakeimage3.jpg',
+            content=str.encode('third fake image'),
+            content_type='image/jpeg',
+        )
+        response = self.user1_client.post(TWEET_CREATE_URL, {
+            'content': 'test multiple photos upload',
+            'files': [file2, file3]
+        })
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(TweetPhoto.objects.count(), 3)
+
+        # test response including the urls of photos
+        tweet_id = response.data['tweet']['id']
+        retrieve_url = TWEET_RETRIEVE_URL.format(tweet_id, False)
+        response = self.user1_client.get(retrieve_url)
+        self.assertEqual(len(response.data['photo_urls']), 2)
+        self.assertEqual('fakeimage2' in response.data['photo_urls'][0], True)
+        self.assertEqual('fakeimage3' in response.data['photo_urls'][1], True)
+
+        # test upload more than 9 phots
+        files = [
+            SimpleUploadedFile(
+                name=f'photo{i}.jpg',
+                content_type='image/jpeg',
+                content=str.encode(f'upload photo {i}')
+            )
+            for i in range(10)
+        ]
+        response = self.user1_client.post(TWEET_CREATE_URL, {
+            'content': 'test upload photos more than 9',
+            'files': files
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(TweetPhoto.objects.count(), 3)

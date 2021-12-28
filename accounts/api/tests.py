@@ -124,7 +124,7 @@ class UserProfileApiTests(TestCase):
         user_profile = user1.profile
         user_profile.nickname = 'test nickname'
         user_profile.save()
-        url = USER_PROFILE_DETAIL_URL.format(user_profile.id)
+        url = USER_PROFILE_DETAIL_URL.format(user1.id)
 
         # test authorization for update profile
         user2, client2 = self.create_user_and_client('user2')
