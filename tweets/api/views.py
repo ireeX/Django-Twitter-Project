@@ -18,7 +18,7 @@ class TweetViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    GenericViewSet):
 
-    serializer_class = TweetSerializerForUpdate
+    serializer_class = TweetSerializerForCreate
     queryset = Tweet.objects.all() 
 
     def get_permissions(self):
