@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
 from likes.models import Like
+from tweets.constants import TWEET_PHOTO_STATUS_CHOICES, TweetPhotoStatus
 
 import pytz
 
@@ -44,3 +45,35 @@ class Tweet(models.Model):
     def __str__(self):
         # easy for print tweet
         return f'{self.created_at} {self.user}: {self.content}'
+
+
+class TweetPhoto(models.Model):
+    tweet = models.ForeignKey(Tweet, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    file = models.FileField()
+    order = models.IntegerField(default=0)
+
+    # for validation of the image
+    status = models.IntegerField(
+        default=TweetPhotoStatus.PENDING,
+        choices=TWEET_PHOTO_STATUS_CHOICES,
+    )
+
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        index_together = (
+            # user album
+            ('user', 'created_at'),
+            # photos to be deleted
+            ('is_deleted', 'created_at'),
+            # for update photo status
+            ('status', 'created_at'),
+            # for display a tweet
+            ('tweet', 'order'),
+        )
+
+    def __str__(self):
+        return f'{self.tweet.id}: {self.file}'

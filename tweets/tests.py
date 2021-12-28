@@ -1,6 +1,7 @@
 from utils.testcases import TestCase
 from datetime import datetime, timedelta
-from tweets.models import Tweet
+from tweets.models import TweetPhoto
+from tweets.constants import TweetPhotoStatus
 
 import pytz
 
@@ -26,3 +27,12 @@ class TweetModelTests(TestCase):
         # test like repeatedly for a tweet
         self.create_like(self.user1, self.tweet)
         self.assertEqual(self.tweet.like_set.count(), 2)
+
+    def test_create_photo(self):
+        photo = TweetPhoto.objects.create(
+            tweet=self.tweet,
+            user=self.user1,
+        )
+        self.assertEqual(photo.user, self.user1)
+        self.assertEqual(photo.status, TweetPhotoStatus.PENDING)
+        self.assertEqual(self.tweet.tweetphoto_set.count(), 1)
