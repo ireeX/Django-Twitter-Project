@@ -12,6 +12,7 @@ from tweets.models import Tweet
 from newsfeeds.services import NewsFeedService
 from utils.decorators import required_params
 from utils.permissions import IsObjectOwner
+from utils.pagination import EndlessPagination
 
 
 class TweetViewSet(mixins.CreateModelMixin,
@@ -19,7 +20,8 @@ class TweetViewSet(mixins.CreateModelMixin,
                    GenericViewSet):
 
     serializer_class = TweetSerializerForCreate
-    queryset = Tweet.objects.all() 
+    queryset = Tweet.objects.all()
+    pagination_class = EndlessPagination
 
     def get_permissions(self):
         if self.action in ('list', 'retrieve'):
@@ -63,13 +65,14 @@ class TweetViewSet(mixins.CreateModelMixin,
             user_id=user_id,
             is_deleted=False
         ).prefetch_related('user').order_by('-created_at')
+        tweets = self.paginate_queryset(tweets)
 
         serializer = TweetSerializer(
             tweets,
             context={'request': request},
             many=True
         )
-        return Response({'tweets': serializer.data})
+        return self.get_paginated_response(serializer.data)
 
     @required_params(params=['is_preview'])
     def retrieve(self, request, *args, **kwargs):

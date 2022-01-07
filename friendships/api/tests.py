@@ -1,7 +1,7 @@
 from utils.testcases import TestCase
 from rest_framework.test import APIClient
 from friendships.models import Friendship
-from utils.pagination import FriendshipPagination
+from friendships.api.pagination import FriendshipPagination
 
 
 FOLLOW_URL = '/api/friendships/{}/follow/'
