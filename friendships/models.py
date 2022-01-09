@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save, pre_delete
+from friendships.listeners import invalidate_following_cache
+
 
 class Friendship(models.Model):
     # related_name must set explicitly since there are two User foreignkey
@@ -30,3 +33,7 @@ class Friendship(models.Model):
             ('from_user_id', 'to_user_id'),
         )
         ordering = ('-created_at',)
+
+# hook up with listeners to invalidate cache
+pre_delete.connect(invalidate_following_cache, sender=Friendship)
+post_save.connect(invalidate_following_cache, sender=Friendship)
