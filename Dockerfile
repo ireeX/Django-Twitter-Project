@@ -13,12 +13,14 @@ RUN cd /vagrant \
     && bash provision.sh \
     && service mysql start \
     && bash ./provision.sh \
+    && apt install -y openssh-server \
+    && mv ./sshd_config /etc/ssh/sshd_config\
     && python -m pip install django-debug-toolbar \
     && pip install django-notifications-hq \
     && pip install boto3 \
     && pip install django-storages \
-    && apt install -y openssh-server \
-    && mv ./sshd_config /etc/ssh/sshd_config\
+    && apt install memcached \
+    && pip install python-memcached \
     && useradd -s  /bin/bash iree\
     && usermod -aG sudo iree
 

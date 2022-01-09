@@ -6,7 +6,26 @@ from friendships.models import Friendship
 from friendships.services import FriendshipService
 
 
-class FollowerSerializer(serializers.ModelSerializer):
+class FollowingUserIdSetMixin:
+
+    @property
+    def following_user_id_set(self: serializers.ModelSerializer):
+        """
+        Return cached following user ids.
+        `_cached_following_user_id_set` is instance level cache.
+        """
+        if self.context['request'].user.is_anonymous:
+            return {}
+        if hasattr(self, '_cached_following_user_id_set'):
+            return self._cached_following_user_id_set
+        user_id_set = FriendshipService.get_following_user_id_set(
+            self.context['request'].user.id
+        )
+        setattr(self, '_cached_following_user_id_set', user_id_set)
+        return user_id_set
+
+
+class FollowerSerializer(serializers.ModelSerializer, FollowingUserIdSetMixin):
     # use 'source=xxx' to identify the xxx field in model.
     user = UserSerializerForFriendship(source='from_user')
     has_followed = serializers.SerializerMethodField()
@@ -16,17 +35,10 @@ class FollowerSerializer(serializers.ModelSerializer):
         fields = ('user', 'created_at', 'is_mutual', 'has_followed')
 
     def get_has_followed(self, obj):
-        if self.context['request'].user.is_anonymous:
-            return False
-        # the following will bring N+1 Queries.
-        # to be optimized
-        return FriendshipService.has_followed(
-            self.context['request'].user,
-            obj.from_user,
-        )
+        return obj.from_user_id in self.following_user_id_set
 
 
-class FollowingSerializer(FollowerSerializer):
+class FollowingSerializer(FollowerSerializer, FollowingUserIdSetMixin):
     user = UserSerializerForFriendship(source='to_user')
     has_followed = serializers.SerializerMethodField()
 
@@ -35,14 +47,7 @@ class FollowingSerializer(FollowerSerializer):
         fields = ('user', 'created_at', 'is_mutual', 'has_followed')
 
     def get_has_followed(self, obj):
-        if self.context['request'].user.is_anonymous:
-            return False
-        # the following will bring N+1 Queries.
-        # to be optimized
-        return FriendshipService.has_followed(
-            self.context['request'].user,
-            obj.to_user,
-        )
+        return obj.to_user_id in self.following_user_id_set
 
 
 class FriendshipSerializerForCreate(serializers.ModelSerializer):
