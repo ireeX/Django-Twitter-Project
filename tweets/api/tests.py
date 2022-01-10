@@ -14,6 +14,7 @@ TWEET_RETRIEVE_URL = '/api/tweets/{}/?is_preview={}'
 class TweetApiTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         self.anonymous_user = APIClient()
 
         self.user1 = self.create_user('user1')

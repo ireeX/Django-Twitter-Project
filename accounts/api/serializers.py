@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email')
 
 
-class UserSerializerWithProfile(serializers.ModelSerializer):
+class UserSerializerWithProfile(UserSerializer):
     # user.profile.nickname
     nickname = serializers.CharField(source='profile.nickname')
     avatar_url = serializers.SerializerMethodField()

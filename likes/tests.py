@@ -7,6 +7,7 @@ from tweets.models import Tweet
 class LikeModelTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         self.user = self.create_user('user')
         self.tweet = self.create_tweet(self.user, 'tweet for testing like model')
         self.comment = self.create_comment(self.user, self.tweet, 'comment for testing like model')

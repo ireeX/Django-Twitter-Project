@@ -13,6 +13,7 @@ USER_PROFILE_DETAIL_URL = '/api/profiles/{}/'
 class AccountApiTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         self.client = APIClient()
         self.user = self.create_user('admin', 'admin@twitter.com', 'correct password')
 
@@ -118,6 +119,9 @@ class AccountApiTests(TestCase):
 
 
 class UserProfileApiTests(TestCase):
+
+    def setUp(self):
+        self.clear_cache()
 
     def test_update(self):
         user1, client1 = self.create_user_and_client('user1')

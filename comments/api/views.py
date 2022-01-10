@@ -28,7 +28,7 @@ class CommentViewSet(viewsets.GenericViewSet):
     def list(self, request):
         queryset = self.get_queryset()
         # to be continued, order by likes count
-        comments = self.filter_queryset(queryset).prefetch_related('user').order_by('created_at')
+        comments = self.filter_queryset(queryset).order_by('created_at')
         serializer = CommentSerializer(
             comments,
             context={'request': request},

@@ -9,6 +9,7 @@ import pytz
 class TweetModelTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         self.user1 = self.create_user('user1')
         self.user2 = self.create_user('user2')
         self.tweet = self.create_tweet(user=self.user1, content='test tweet model')

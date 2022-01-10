@@ -27,7 +27,7 @@ class FollowingUserIdSetMixin:
 
 class FollowerSerializer(serializers.ModelSerializer, FollowingUserIdSetMixin):
     # use 'source=xxx' to identify the xxx field in model.
-    user = UserSerializerForFriendship(source='from_user')
+    user = UserSerializerForFriendship(source='cached_from_user')
     has_followed = serializers.SerializerMethodField()
 
     class Meta:
@@ -39,7 +39,7 @@ class FollowerSerializer(serializers.ModelSerializer, FollowingUserIdSetMixin):
 
 
 class FollowingSerializer(FollowerSerializer, FollowingUserIdSetMixin):
-    user = UserSerializerForFriendship(source='to_user')
+    user = UserSerializerForFriendship(source='cached_to_user')
     has_followed = serializers.SerializerMethodField()
 
     class Meta:
