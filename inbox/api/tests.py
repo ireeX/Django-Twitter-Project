@@ -10,6 +10,7 @@ NOTIFICATION_BASE_URL = '/api/notifications/{}/'
 class NotificationServiceTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         self.user1, self.user_client1 = self.create_user_and_client('user1')
         self.user2, self.user_client2 = self.create_user_and_client('user2')
         self.tweet1 = self.create_tweet(self.user1)

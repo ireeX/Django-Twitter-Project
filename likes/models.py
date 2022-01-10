@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from accounts.services import UserService
 
 """
 The Like model can be applied to both Comment and Tweet.
@@ -27,6 +28,10 @@ class Like(models.Model):
             # all the objects liked by a certain user
             ('user', 'content_type', 'created_at',),
         )
+
+    @property
+    def cached_user(self):
+        return UserService.get_user_through_cache(self.user_id)
 
     def __str__(self):
         return '{} - {} liked {} {}'.format(

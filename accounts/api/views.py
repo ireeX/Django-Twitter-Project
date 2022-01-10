@@ -100,13 +100,6 @@ class UserProfileViewSet(
     viewsets.GenericViewSet,
     viewsets.mixins.UpdateModelMixin,
 ):
+    queryset = UserProfile.objects.all()
     permission_classes = [IsAuthenticated, IsObjectOwner,]
     serializer_class = UserProfileSerializerForUpdate
-
-    # '/api/profiles/{pk}/' the pk refers to user_id, not the UserProfile id
-    # get_object() retrieve the user profile of the according user_id
-    def get_object(self):
-        obj = UserProfile.objects.get(user_id=self.kwargs['pk'])
-        # May raise a permission denied
-        self.check_object_permissions(self.request, obj)
-        return obj

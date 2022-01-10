@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
 from likes.models import Like
 from tweets.constants import TWEET_PHOTO_STATUS_CHOICES, TweetPhotoStatus
+from accounts.services import UserService
 
 import pytz
 
@@ -45,6 +46,10 @@ class Tweet(models.Model):
     def __str__(self):
         # easy for print tweet
         return f'{self.created_at} {self.user}: {self.content}'
+
+    @property
+    def cached_user(self):
+        return UserService.get_user_through_cache(self.user_id)
 
 
 class TweetPhoto(models.Model):
