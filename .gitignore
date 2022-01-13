@@ -6,7 +6,7 @@ __pycache__/
 .DS_Store
 .yaml
 media/
-
+.rdb
 
 # C extensions
 *.so

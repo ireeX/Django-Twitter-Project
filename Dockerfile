@@ -15,12 +15,14 @@ RUN cd /vagrant \
     && bash ./provision.sh \
     && apt install -y openssh-server \
     && mv ./sshd_config /etc/ssh/sshd_config\
-    && python -m pip install django-debug-toolbar \
-    && pip install django-notifications-hq \
-    && pip install boto3 \
-    && pip install django-storages \
+    && pip install django-debug-toolbar==3.2.2 \
+    && pip install django-notifications-hq==1.6.0 \
+    && pip install boto3==1.20.26 \
+    && pip install django-storages==1.12.3 \
     && apt install memcached \
-    && pip install python-memcached \
+    && pip install python-memcached==1.59 \
+    && apt install redis \
+    && pip install redis==3.5.3 \
     && useradd -s  /bin/bash iree\
     && usermod -aG sudo iree
 
