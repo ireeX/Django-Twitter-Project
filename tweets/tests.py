@@ -2,8 +2,10 @@ from utils.testcases import TestCase
 from datetime import datetime, timedelta
 from tweets.models import TweetPhoto
 from tweets.constants import TweetPhotoStatus
-from utils.redis_client import RedisClient
-from utils.redis_serializers import DjangoModelSerializer
+from utils.cache.redis_client import RedisClient
+from utils.cache.redis_serializers import DjangoModelSerializer
+from tweets.services import TweetService
+from twitter.cache import USER_TWEETS_PATTERN
 
 import pytz
 
@@ -51,3 +53,27 @@ class TweetModelTests(TestCase):
         data = conn.get(f'tweet:{tweet.id}')
         cached_tweet = DjangoModelSerializer.deserialize(data)
         self.assertEqual(tweet, cached_tweet)
+
+    def test_get_user_tweets(self):
+        tweet_ids = []
+        for i in range(3):
+            tweet = self.create_tweet(self.user1, 'tweet {}'.format(i))
+            tweet_ids.append(tweet.id)
+        tweet_ids = tweet_ids[::-1]
+
+        RedisClient.clear()
+        conn = RedisClient.get_connection()
+
+        #cache miss
+        tweets = TweetService.get_cached_tweets(self.user1.id)
+        self.assertEqual([t.id for t in tweets][:3], tweet_ids)
+
+        # cache hit
+        tweets = TweetService.get_cached_tweets(self.user1.id)
+        self.assertEqual([t.id for t in tweets][:3], tweet_ids)
+
+        # cache updated
+        new_tweet = self.create_tweet(self.user1, 'new tweet')
+        tweets = TweetService.get_cached_tweets(self.user1.id)
+        tweet_ids.insert(0, new_tweet.id)
+        self.assertEqual([t.id for t in tweets][:4], tweet_ids)

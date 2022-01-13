@@ -9,6 +9,7 @@ from tweets.api.serializers import (
     TweetSerializerWithDetail,
 )
 from tweets.models import Tweet
+from tweets.services import TweetService
 from newsfeeds.services import NewsFeedService
 from utils.decorators import required_params
 from utils.permissions import IsObjectOwner
@@ -61,10 +62,12 @@ class TweetViewSet(mixins.CreateModelMixin,
         # UserSerializer and make as many query as the tweet count to retrieve
         # user information from db after using prefetch_related(),
         # there will only be one query
-        tweets = Tweet.objects.filter(
-            user_id=user_id,
-            is_deleted=False
-        ).prefetch_related('user').order_by('-created_at')
+        # tweets = Tweet.objects.filter(
+        #     user_id=user_id,
+        #     is_deleted=False
+        # ).prefetch_related('user').order_by('-created_at')
+        user_id = request.query_params['user_id']
+        tweets = TweetService.get_cached_tweets(user_id=user_id)
         tweets = self.paginate_queryset(tweets)
 
         serializer = TweetSerializer(

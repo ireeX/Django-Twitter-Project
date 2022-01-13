@@ -20,7 +20,7 @@ class RedisClient:
     @classmethod
     def clear(cls):
         """
-        Clear all cache in redis, for testing purpose
+        Clear all cache in cache, for testing purpose
         """
         if not settings.TESTING:
             return Exception("You can not flush Redis in production environment")

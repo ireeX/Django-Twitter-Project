@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from tweets.models import Tweet
-from utils.memcached_helper import MemcachedHelper
+from utils.cache.memcached_helper import MemcachedHelper
 
 class NewsFeed(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)

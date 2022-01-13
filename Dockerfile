@@ -21,8 +21,8 @@ RUN cd /vagrant \
     && pip install django-storages==1.12.3 \
     && apt install memcached \
     && pip install python-memcached==1.59 \
-    && apt install redis \
-    && pip install redis==3.5.3 \
+    && apt install cache \
+    && pip install cache==3.5.3 \
     && useradd -s  /bin/bash iree\
     && usermod -aG sudo iree
 

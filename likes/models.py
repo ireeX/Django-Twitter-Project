@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from utils.memcached_helper import MemcachedHelper
+from utils.cache.memcached_helper import MemcachedHelper
 
 """
 The Like model can be applied to both Comment and Tweet.

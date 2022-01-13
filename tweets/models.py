@@ -4,7 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
 from likes.models import Like
 from tweets.constants import TWEET_PHOTO_STATUS_CHOICES, TweetPhotoStatus
-from utils.memcached_helper import MemcachedHelper
+from tweets.listeners import push_tweet_to_cache
+from utils.cache.memcached_helper import MemcachedHelper
 from utils.listeners import invalidate_object_cache
 from django.db.models.signals import post_save, pre_delete
 
@@ -85,6 +86,8 @@ class TweetPhoto(models.Model):
     def __str__(self):
         return f'{self.tweet.id}: {self.file}'
 
-
+# For memcached
 post_save.connect(invalidate_object_cache, sender=Tweet)
 pre_delete.connect(invalidate_object_cache, sender=Tweet)
+# For redis
+post_save.connect(push_tweet_to_cache, sender=Tweet)

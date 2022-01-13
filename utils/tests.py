@@ -1,5 +1,5 @@
 from utils.testcases import TestCase
-from utils.redis_client import RedisClient
+from utils.cache.redis_client import RedisClient
 
 
 class UtilsTests(TestCase):

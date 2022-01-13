@@ -34,9 +34,9 @@ def get_profile(user):
 User.profile = property(get_profile)
 
 
+# For memcached
 # hook up with listeners to invalidate cache
 pre_delete.connect(invalidate_object_cache, sender=User)
 post_save.connect(invalidate_object_cache, sender=User)
-
 pre_delete.connect(profile_changed, sender=UserProfile)
 post_save.connect(profile_changed, sender=UserProfile)

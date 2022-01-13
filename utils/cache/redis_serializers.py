@@ -1,6 +1,5 @@
 from django.core import serializers
-from utils.json_encoder import JSONEncoder
-from django.core.serializers.json import Deserializer
+from utils.cache.json_encoder import JSONEncoder
 
 
 class DjangoModelSerializer:

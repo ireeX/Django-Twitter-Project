@@ -12,7 +12,9 @@ We use push mode (fanout on write) for newsfeed module.
 | Account Logout            | POST  | /api/accounts/logout/                     |                           |
 | Check Account Status      | GET   | /api/accounts/login_status/               |                           |
 | Account Register          | POST  | /api/accounts/signup/                     | username, password, email |
-| View Tweets               | GET   | /api/tweets/?user_id={user_id}            |                           |
+| View Tweets               | GET   | /api/tweets/?user_id={user_id}&page={page_number}|                     |
+| View Latest Tweets        | GET   | /api/tweets/?user_id={user_id}&created_at__gt={time} |                |
+| View Previous Tweets      | GET   | /api/tweets/?user_id={user_id}&created_at__lt={time} |                |
 | Post Tweet                | POST  | /api/tweets/?user_id={user_id}            | content                   |
 | Update Tweet              | PUT   | /api/tweets/{tweet_id}/                   | content                   |
 | Delete Tweet              | DELETE| /api/tweets/{tweet_id}/                   |                           |
