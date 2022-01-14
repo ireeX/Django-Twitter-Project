@@ -9,7 +9,9 @@ class RedisHelper:
         conn = RedisClient.get_connection()
 
         serialized_list = []
-        for obj in objects:
+        # Limit the Redis cache size to avoid large memory usage
+        # If data beyond the limit, retrieve from DB
+        for obj in objects[:settings.REDIS_LIST_LENGTH_LIMIT]:
             serialized_data = DjangoModelSerializer.serialize(obj)
             serialized_list.append(serialized_data)
 
@@ -46,3 +48,4 @@ class RedisHelper:
         This is the reason for using Redis to cache tweets.
         """
         conn.lpush(key, serialized_data)
+        conn.ltrim(key, 0, settings.REDIS_LIST_LENGTH_LIMIT - 1)
