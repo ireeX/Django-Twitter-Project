@@ -20,6 +20,11 @@ class TweetService:
 
     @classmethod
     def get_cached_tweets(cls, user_id):
+        """
+        To be continued:
+        Cache tweet_id in Redis and tweet data (content, ts...) to Memcached.
+        This will be useful for supporting `Edit Tweet` function
+        """
         queryset = Tweet.objects.filter(user_id=user_id).order_by('-created_at')
         key = USER_TWEETS_PATTERN.format(user_id=user_id)
         return RedisHelper.load_objects(key, queryset)

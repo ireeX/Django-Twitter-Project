@@ -5,3 +5,4 @@ USER_PROFILE_PATTERN = 'userprofile_{user_id}'
 
 # for Redis
 USER_TWEETS_PATTERN = 'user_tweets:{user_id}'
+NEWSFEEDS_PATTERNN = 'newsfeeds:{user_id}'

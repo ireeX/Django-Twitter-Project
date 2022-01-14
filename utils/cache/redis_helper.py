@@ -41,4 +41,8 @@ class RedisHelper:
             return
         # cache hit
         serialized_data = DjangoModelSerializer.serialize(obj)
+        """
+        A list is needed to maintain tweets by timeline.
+        This is the reason for using Redis to cache tweets.
+        """
         conn.lpush(key, serialized_data)
