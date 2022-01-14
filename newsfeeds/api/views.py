@@ -10,13 +10,13 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
     pagination_class = EndlessPagination
 
-    def get_queryset(self):
-        return NewsFeed.objects.filter(user=self.request.user).prefetch_related('user', 'tweet')
-
     def list(self, request):
-        queryset = NewsFeedService.get_cached_newsfeeds(request.user.id)
-
-        page = self.paginate_queryset(queryset)
+        cached_newsfeeds = NewsFeedService.get_cached_newsfeeds(request.user.id)
+        page = self.paginator.paginate_cached_list(cached_newsfeeds, request)
+        # the wanted data is not in cache, need to fetch from DB
+        if page is None:
+            queryset = NewsFeed.objects.filter(user=request.user)
+            page = self.paginate_queryset(queryset)
         serializer = NewsFeedSerializer(
             page,
             # for TweetSerializer.get_has_liked()
